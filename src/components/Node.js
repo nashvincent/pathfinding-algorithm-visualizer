@@ -14,7 +14,7 @@ export default function Node({
     <div
       className={`node ${style}`}
       onMouseDown={() => handleMouseDown(row, column)}
-      onMouseEnter={() => handleMouseEnter(row, column)}
+      onMouseOver={() => handleMouseEnter(row, column)}
       onMouseUp={() => handleMouseUp()}
     ></div>
   )

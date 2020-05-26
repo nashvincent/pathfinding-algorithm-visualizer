@@ -42,6 +42,7 @@ export default function Visualizer() {
   }
 
   const handleMouseDown = (row, col) => {
+    setMouseIsPressed(false)
     const updatedGrid = getUpdatedGrid(row, col)
     setGrid(updatedGrid)
     setMouseIsPressed(true)
@@ -69,10 +70,22 @@ export default function Visualizer() {
           handleMouseDown={handleMouseDown}
           handleMouseEnter={handleMouseEnter}
           handleMouseUp={handleMouseUp}
+          handleDrag={handleDrag}
         />
       ))}
     </div>
   ))
 
-  return <div className="grid">{getGraph}</div>
+  return (
+    <div>
+      <button
+        onClick={() => {
+          setGrid(getEmptyGrid())
+        }}
+      >
+        CLEAR
+      </button>
+      <div className="grid">{getGraph}</div>
+    </div>
+  )
 }
