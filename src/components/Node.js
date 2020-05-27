@@ -3,18 +3,30 @@ import React from 'react'
 export default function Node({
   row,
   column,
+  isStart,
+  isEnd,
   isWall,
+  isVisited,
   handleMouseDown,
   handleMouseEnter,
   handleMouseUp,
 }) {
-  const style = isWall ? 'wall' : ''
+  const style = isStart
+    ? 'start-node'
+    : isEnd
+    ? 'end-node'
+    : isVisited
+    ? 'visited'
+    : isWall
+    ? 'wall'
+    : ''
 
   return (
     <div
+      id={`node-${row}-${column}`}
       className={`node ${style}`}
-      onMouseDown={() => handleMouseDown(row, column)}
-      onMouseOver={() => handleMouseEnter(row, column)}
+      onMouseDown={e => handleMouseDown(row, column, e)}
+      onMouseEnter={() => handleMouseEnter(row, column)}
       onMouseUp={() => handleMouseUp()}
     ></div>
   )

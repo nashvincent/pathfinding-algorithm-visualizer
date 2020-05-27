@@ -1,6 +1,12 @@
 import React, { useState } from 'react'
 
 import Node from './Node'
+import { dijkstra, getShortestPath } from '../algs/dijkstra'
+
+const SROW = 6
+const SCOL = 7
+const EROW = 6
+const ECOL = 20
 
 export default function Visualizer() {
   const getEmptyGrid = () => {
@@ -22,6 +28,11 @@ export default function Visualizer() {
       row,
       column,
       isWall: false,
+      isStart: row === SROW && column === SCOL,
+      isEnd: row === EROW && column === ECOL,
+      distance: Infinity,
+      isVisited: false,
+      previousNode: null,
     }
   }
 
@@ -41,7 +52,9 @@ export default function Visualizer() {
     return updatedGrid
   }
 
-  const handleMouseDown = (row, col) => {
+  const handleMouseDown = (row, col, event) => {
+    // Prevents dragging of nodes which can break the app
+    event.preventDefault()
     setMouseIsPressed(false)
     const updatedGrid = getUpdatedGrid(row, col)
     setGrid(updatedGrid)
@@ -67,14 +80,32 @@ export default function Visualizer() {
           row={node.row}
           column={node.column}
           isWall={node.isWall}
+          isStart={node.isStart}
+          isEnd={node.isEnd}
+          isVisited={node.isVisited}
           handleMouseDown={handleMouseDown}
           handleMouseEnter={handleMouseEnter}
           handleMouseUp={handleMouseUp}
-          handleDrag={handleDrag}
         />
       ))}
     </div>
   ))
+
+  const animateNodes = nodeList => {
+    nodeList.forEach((node, nodeIdx) => {
+      console.log('IDX: ', node)
+      setTimeout(() => {
+        document.getElementById(`node-${node.row}-${node.column}`).className =
+          'node visited'
+      }, 35 * nodeIdx)
+    })
+  }
+
+  const visualize = () => {
+    const visitedNodesInOrder = dijkstra(grid, grid[SROW][SCOL], grid[EROW][ECOL])
+    const shortestPath = getShortestPath(grid[EROW][ECOL])
+    animateNodes(visitedNodesInOrder, shortestPath)
+  }
 
   return (
     <div>
@@ -84,6 +115,14 @@ export default function Visualizer() {
         }}
       >
         CLEAR
+      </button>
+
+      <button
+        onClick={() => {
+          visualize()
+        }}
+      >
+        VISUALIZE
       </button>
       <div className="grid">{getGraph}</div>
     </div>
