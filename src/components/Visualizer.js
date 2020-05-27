@@ -3,12 +3,14 @@ import React, { useState } from 'react'
 import Node from './Node'
 import { dijkstra, getShortestPath } from '../algs/dijkstra'
 
+// Setting the coordinates for the start node and the end node
 const SROW = 6
 const SCOL = 7
 const EROW = 6
 const ECOL = 20
 
 export default function Visualizer() {
+  // Creates a 2D array that makes up the grid
   const getEmptyGrid = () => {
     let nodes = []
     // row
@@ -55,6 +57,7 @@ export default function Visualizer() {
   const handleMouseDown = (row, col, event) => {
     // Prevents dragging of nodes which can break the app
     event.preventDefault()
+
     setMouseIsPressed(false)
     const updatedGrid = getUpdatedGrid(row, col)
     setGrid(updatedGrid)
@@ -72,7 +75,7 @@ export default function Visualizer() {
     setMouseIsPressed(false)
   }
 
-  const getGraph = grid.map((row, rowIdx) => (
+  const getGrid = grid.map((row, rowIdx) => (
     <div key={rowIdx}>
       {row.map((node, nodeIdx) => (
         <Node
@@ -91,19 +94,34 @@ export default function Visualizer() {
     </div>
   ))
 
-  const animateNodes = nodeList => {
+  const animateNodes = (nodeList, shortestPath) => {
     nodeList.forEach((node, nodeIdx) => {
-      console.log('IDX: ', node)
+      if (nodeIdx === nodeList.length - 1) {
+        setTimeout(() => {
+          animateShortestPath(shortestPath)
+        }, 50 * nodeIdx)
+      }
+
       setTimeout(() => {
         document.getElementById(`node-${node.row}-${node.column}`).className =
           'node visited'
-      }, 35 * nodeIdx)
+      }, 50 * nodeIdx)
+    })
+  }
+
+  const animateShortestPath = shortestPath => {
+    shortestPath.forEach((node, nodeIdx) => {
+      setTimeout(() => {
+        document.getElementById(`node-${node.row}-${node.column}`).className =
+          'node shortest-path'
+      }, 40 * nodeIdx)
     })
   }
 
   const visualize = () => {
     const visitedNodesInOrder = dijkstra(grid, grid[SROW][SCOL], grid[EROW][ECOL])
     const shortestPath = getShortestPath(grid[EROW][ECOL])
+
     animateNodes(visitedNodesInOrder, shortestPath)
   }
 
@@ -124,7 +142,7 @@ export default function Visualizer() {
       >
         VISUALIZE
       </button>
-      <div className="grid">{getGraph}</div>
+      <div className="grid">{getGrid}</div>
     </div>
   )
 }
