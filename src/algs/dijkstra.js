@@ -29,7 +29,7 @@ export const getShortestPath = endNode => {
   let shortestPath = []
   let currentNode = endNode
   while (currentNode !== null) {
-    shortestPath.shift(currentNode)
+    shortestPath.unshift(currentNode)
     currentNode = currentNode.previousNode
   }
   return shortestPath
