@@ -3,6 +3,23 @@ import React, { useState } from 'react'
 import Node from './Node'
 import { dijkstra, getShortestPath } from '../algs/dijkstra'
 
+// TODO:
+// Fix walls-drawn-without-clicking bug when mouse goes outside the grid
+// Handle edge cases like preventing new walls from being drawn during animation
+// Learn and implement A* algorithm
+// Learn and implement Bidirectional Swarm Algorithm
+// Learn and implement Recursive Division algorithm to make a maze using walls
+// Work on UI/UX
+
+// OPTIONALS:
+// Find a way to make the start and end node distinct even AFTER animations
+// Find a way to make the start and end node dynamic
+// Find a way to have live updation of the algorithm path and shortest path by moving the start/end node AFTER animation has been done
+// Learn and implement other algorithms
+
+// Settings the number of rows and columns
+const ROWS = 15
+const COLS = 30
 // Setting the coordinates for the start node and the end node
 const SROW = 6
 const SCOL = 7
@@ -14,10 +31,10 @@ export default function Visualizer() {
   const getEmptyGrid = () => {
     let nodes = []
     // row
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < ROWS; i++) {
       let currentRow = []
       // column
-      for (let j = 0; j < 30; j++) {
+      for (let j = 0; j < COLS; j++) {
         currentRow.push(createNode(i, j))
       }
       nodes.push(currentRow)
@@ -125,14 +142,43 @@ export default function Visualizer() {
     animateNodes(visitedNodesInOrder, shortestPath)
   }
 
+  // Fn to handle clearing the animations and also the walls depending on the value of the boolean clearWalls
+  const clearAnimations = clearWalls => {
+    let clearedGrid = grid.slice()
+    for (let i = 0; i < ROWS; i++) {
+      for (let j = 0; j < COLS; j++) {
+        if (clearWalls === true) {
+          clearedGrid[i][j] = createNode(i, j)
+          document.getElementById(`node-${i}-${j}`).className = 'node'
+        } else {
+          if (!clearedGrid[i][j].isWall) {
+            clearedGrid[i][j] = createNode(i, j)
+            document.getElementById(`node-${i}-${j}`).className = 'node'
+          }
+        }
+      }
+    }
+    setGrid(clearedGrid)
+    document.getElementById(`node-${SROW}-${SCOL}`).className = 'node start-node'
+    document.getElementById(`node-${EROW}-${ECOL}`).className = 'node end-node'
+  }
+
   return (
     <div>
       <button
         onClick={() => {
-          setGrid(getEmptyGrid())
+          clearAnimations(false)
         }}
       >
-        CLEAR
+        Clear Animations
+      </button>
+
+      <button
+        onClick={() => {
+          clearAnimations(true)
+        }}
+      >
+        Clear All
       </button>
 
       <button

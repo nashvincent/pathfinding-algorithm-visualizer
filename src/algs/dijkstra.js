@@ -52,5 +52,5 @@ const getClosestNeighbours = (grid, node) => {
   if (column < grid[0].length - 1) neighbours.push(grid[row][column + 1])
 
   // Return only nodes that have not yet been visited
-  return neighbours.filter(neighbour => !neighbour.isVisited)
+  return neighbours.filter(neighbour => !neighbour.isVisited && !neighbour.isWall)
 }
