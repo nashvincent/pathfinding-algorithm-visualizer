@@ -65,6 +65,7 @@
   100% {
     transform: scale(1);
     background-color: rgb(12, 53, 71);
+    outline: 0px;
   }
 }
 
