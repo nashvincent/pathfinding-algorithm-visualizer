@@ -1,15 +1,29 @@
 import React, { useState } from 'react'
 
 import Node from './Node'
+import Navbar from '../components/Navbar'
+import NavItem from '../components/NavItem'
+import DropdownMenu from '../components/DropdownMenu'
 import { dijkstra, getShortestPath } from '../algs/dijkstra'
+import { astar } from '../algs/astar'
+import { dfs } from '../algs/dfs'
+
+import { ReactComponent as ClearAllIcon } from '../assets/clearAll.svg'
+import { ReactComponent as ClearAnimationsIcon } from '../assets/clearAnimations.svg'
+import { ReactComponent as SettingsIcon } from '../assets/settings.svg'
+import { ReactComponent as StartIcon } from '../assets/start.svg'
+import { ReactComponent as MazeIcon } from '../assets/maze.svg'
 
 // TODO:
+// Add Tooltips for each icon in Navbar
+// Refactor code to use Refs instead of directly accessing the DOM for animations
 // Fix walls-drawn-without-clicking bug when mouse goes outside the grid
 // Handle edge cases like preventing new walls from being drawn during animation
 // Learn and implement A* algorithm
 // Learn and implement Bidirectional Swarm Algorithm
 // Learn and implement Recursive Division algorithm to make a maze using walls
 // Work on UI/UX
+// Get rid of all warnings
 
 // OPTIONALS:
 // Find a way to make the start and end node distinct even AFTER animations
@@ -50,13 +64,17 @@ export default function Visualizer() {
       isStart: row === SROW && column === SCOL,
       isEnd: row === EROW && column === ECOL,
       distance: Infinity,
+      totalDistance: Infinity,
+      heuristicDistance: null,
       isVisited: false,
       previousNode: null,
+      direction: null,
     }
   }
 
   const [grid, setGrid] = useState(getEmptyGrid)
   const [mouseIsPressed, setMouseIsPressed] = useState(false)
+  const [currentAlg, setCurrentAlg] = useState('dijkstra')
 
   // Returns a new grid with the specified node turned into a wall
   const getUpdatedGrid = (row, col) => {
@@ -112,17 +130,18 @@ export default function Visualizer() {
   ))
 
   const animateNodes = (nodeList, shortestPath) => {
+    let animTime = 50
     nodeList.forEach((node, nodeIdx) => {
       if (nodeIdx === nodeList.length - 1) {
         setTimeout(() => {
           animateShortestPath(shortestPath)
-        }, 50 * nodeIdx)
+        }, animTime * nodeIdx)
       }
 
       setTimeout(() => {
         document.getElementById(`node-${node.row}-${node.column}`).className =
           'node visited'
-      }, 50 * nodeIdx)
+      }, animTime * nodeIdx)
     })
   }
 
@@ -136,8 +155,26 @@ export default function Visualizer() {
   }
 
   const visualize = () => {
-    const visitedNodesInOrder = dijkstra(grid, grid[SROW][SCOL], grid[EROW][ECOL])
+    let visitedNodesInOrder
+    switch (currentAlg) {
+      case 'dijkstra':
+        visitedNodesInOrder = dijkstra(grid, grid[SROW][SCOL], grid[EROW][ECOL])
+        break
+
+      case 'astar':
+        visitedNodesInOrder = astar(grid, grid[SROW][SCOL], grid[EROW][ECOL])
+        break
+
+      case 'dfs':
+        visitedNodesInOrder = dfs(grid, grid[SROW][SCOL], grid[EROW][ECOL])
+        break
+
+      default:
+        visitedNodesInOrder = dijkstra(grid, grid[SROW][SCOL], grid[EROW][ECOL])
+        break
+    }
     const shortestPath = getShortestPath(grid[EROW][ECOL])
+    //console.log(shortestPath)
 
     animateNodes(visitedNodesInOrder, shortestPath)
   }
@@ -163,31 +200,38 @@ export default function Visualizer() {
     document.getElementById(`node-${EROW}-${ECOL}`).className = 'node end-node'
   }
 
+  const generateRandomMaze = () => {
+    clearAnimations(true)
+    let tempGrid = grid.slice()
+    tempGrid.forEach(row => {
+      row.forEach(node => {
+        let isMazeWall = Math.random() >= 0.68
+        if (isMazeWall) {
+          if (node !== grid[SROW][SCOL] && node !== grid[EROW][ECOL]) node.isWall = true
+        }
+      })
+    })
+    setGrid(tempGrid)
+  }
+
+  const handleSetNewAlg = alg => setCurrentAlg(alg)
+
   return (
     <div>
-      <button
-        onClick={() => {
-          clearAnimations(false)
-        }}
-      >
-        Clear Animations
-      </button>
-
-      <button
-        onClick={() => {
-          clearAnimations(true)
-        }}
-      >
-        Clear All
-      </button>
-
-      <button
-        onClick={() => {
-          visualize()
-        }}
-      >
-        VISUALIZE
-      </button>
+      <Navbar>
+        <NavItem icon={<StartIcon />} handleClick={e => visualize(e)} />
+        <NavItem icon={<MazeIcon />} handleClick={e => generateRandomMaze(e)} />
+        <NavItem icon={<ClearAllIcon />} handleClick={e => clearAnimations(true, e)} />
+        <NavItem
+          icon={<ClearAnimationsIcon />}
+          handleClick={e => clearAnimations(false, e)}
+        />
+        <NavItem icon={<SettingsIcon />}>
+          <DropdownMenu handleSetNewAlg={handleSetNewAlg}>
+            <p>HelloWorld</p>
+          </DropdownMenu>
+        </NavItem>
+      </Navbar>
       <div className="grid">{getGrid}</div>
     </div>
   )
