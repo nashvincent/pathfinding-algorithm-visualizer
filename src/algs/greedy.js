@@ -1,14 +1,16 @@
-export const astar = (grid, startNode, endNode) => {
+export const greedy = (grid, startNode, endNode) => {
   const visitedNodesInOrder = []
   startNode.distance = 0
   startNode.totalDistance = 0
   startNode.heuristicDistance = 0
-  startNode.direction = 'up'
+  startNode.direction = 'right'
   let unvisitedNodes = grid.flat()
   while (unvisitedNodes.length > 0) {
     // Get the closest node depending on totalDistance and heuristic distance
     let closestNode = getClosestNode(unvisitedNodes)
-
+    console.log(
+      `CURRENT NODE: ${closestNode.row} ${closestNode.column}  \n Distance: ${closestNode.distance}`
+    )
     // if the node is a wall, do nothing
     if (closestNode.isWall) continue
 
@@ -29,17 +31,9 @@ const getClosestNode = unvisitedNodes => {
   let currentClosest
   let idx
   for (let i = 0; i < unvisitedNodes.length; i++) {
-    if (
-      !currentClosest ||
-      currentClosest.totalDistance > unvisitedNodes[i].totalDistance
-    ) {
+    if (!currentClosest || currentClosest.distance > unvisitedNodes[i].distance) {
       currentClosest = unvisitedNodes[i]
       idx = i
-    } else if (currentClosest.totalDistance === unvisitedNodes[i].totalDistance) {
-      if (currentClosest.heuristicDistance > unvisitedNodes[i].heuristicDistance) {
-        currentClosest = unvisitedNodes[i]
-        idx = i
-      }
     }
   }
   unvisitedNodes.splice(idx, 1)
@@ -66,16 +60,12 @@ const getClosestNeighbours = (grid, node) => {
   return neighbours.filter(neighbour => !neighbour.isVisited && !neighbour.isWall)
 }
 
-const updateNode = (currentNode, targetNode, endNode, grid) => {
+const updateNode = (currentNode, targetNode, endNode) => {
   let distance = getDistance(currentNode, targetNode)
 
-  if (!targetNode.heuristicDistance)
-    targetNode.heuristicDistance = manhattanDistance(targetNode, endNode)
-
-  let finalDistance = currentNode.distance + distance[0]
+  let finalDistance = distance[0] + manhattanDistance(targetNode, endNode)
   if (finalDistance < targetNode.distance) {
     targetNode.distance = finalDistance
-    targetNode.totalDistance = targetNode.distance + targetNode.heuristicDistance
     targetNode.previousNode = currentNode
     targetNode.direction = distance[2]
   }
@@ -87,7 +77,7 @@ const getDistance = (n1, n2) => {
   let y1 = n1.column
   let x2 = n2.row
   let y2 = n2.column
-  if (x2 < x1 && y1 === y2) {
+  if (x2 < x1) {
     if (n1.direction === 'up') {
       return [1, ['f'], 'up']
     } else if (n1.direction === 'right') {
@@ -96,16 +86,8 @@ const getDistance = (n1, n2) => {
       return [2, ['r', 'f'], 'up']
     } else if (n1.direction === 'down') {
       return [3, ['r', 'r', 'f'], 'up']
-    } else if (n1.direction === 'up-right') {
-      return [1.5, null, 'up']
-    } else if (n1.direction === 'down-right') {
-      return [2.5, null, 'up']
-    } else if (n1.direction === 'up-left') {
-      return [1.5, null, 'up']
-    } else if (n1.direction === 'down-left') {
-      return [2.5, null, 'up']
     }
-  } else if (x2 > x1 && y1 === y2) {
+  } else if (x2 > x1) {
     if (n1.direction === 'up') {
       return [3, ['r', 'r', 'f'], 'down']
     } else if (n1.direction === 'right') {
@@ -114,17 +96,9 @@ const getDistance = (n1, n2) => {
       return [2, ['l', 'f'], 'down']
     } else if (n1.direction === 'down') {
       return [1, ['f'], 'down']
-    } else if (n1.direction === 'up-right') {
-      return [2.5, null, 'down']
-    } else if (n1.direction === 'down-right') {
-      return [1.5, null, 'down']
-    } else if (n1.direction === 'up-left') {
-      return [2.5, null, 'down']
-    } else if (n1.direction === 'down-left') {
-      return [1.5, null, 'down']
     }
   }
-  if (y2 < y1 && x1 === x2) {
+  if (y2 < y1) {
     if (n1.direction === 'up') {
       return [2, ['l', 'f'], 'left']
     } else if (n1.direction === 'right') {
@@ -133,16 +107,8 @@ const getDistance = (n1, n2) => {
       return [1, ['f'], 'left']
     } else if (n1.direction === 'down') {
       return [2, ['r', 'f'], 'left']
-    } else if (n1.direction === 'up-right') {
-      return [2.5, null, 'left']
-    } else if (n1.direction === 'down-right') {
-      return [2.5, null, 'left']
-    } else if (n1.direction === 'up-left') {
-      return [1.5, null, 'left']
-    } else if (n1.direction === 'down-left') {
-      return [1.5, null, 'left']
     }
-  } else if (y2 > y1 && x1 === x2) {
+  } else if (y2 > y1) {
     if (n1.direction === 'up') {
       return [2, ['r', 'f'], 'right']
     } else if (n1.direction === 'right') {
@@ -151,14 +117,6 @@ const getDistance = (n1, n2) => {
       return [3, ['r', 'r', 'f'], 'right']
     } else if (n1.direction === 'down') {
       return [2, ['l', 'f'], 'right']
-    } else if (n1.direction === 'up-right') {
-      return [1.5, null, 'right']
-    } else if (n1.direction === 'down-right') {
-      return [1.5, null, 'right']
-    } else if (n1.direction === 'up-left') {
-      return [2.5, null, 'right']
-    } else if (n1.direction === 'down-left') {
-      return [2.5, null, 'right']
     }
   }
 }

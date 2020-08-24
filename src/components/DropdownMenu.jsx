@@ -17,6 +17,9 @@ function DropdownMenu(props) {
       <DropdownItem icon={<ArrowIcon />} alg="astar" handleSelect={handleSelect}>
         A* Search
       </DropdownItem>
+      <DropdownItem icon={<ArrowIcon />} alg="greedy" handleSelect={handleSelect}>
+        Greedy Best First
+      </DropdownItem>
       <DropdownItem icon={<ArrowIcon />} alg="dfs" handleSelect={handleSelect}>
         Depth First Search
       </DropdownItem>

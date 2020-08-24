@@ -5,8 +5,9 @@ import Navbar from '../components/Navbar'
 import NavItem from '../components/NavItem'
 import DropdownMenu from '../components/DropdownMenu'
 import { dijkstra, getShortestPath } from '../algs/dijkstra'
-import { astar } from '../algs/astar'
 import { dfs } from '../algs/dfs'
+import { astar } from '../algs/astar'
+import { greedy } from '../algs/greedy'
 
 import { ReactComponent as ClearAllIcon } from '../assets/clearAll.svg'
 import { ReactComponent as ClearAnimationsIcon } from '../assets/clearAnimations.svg'
@@ -164,6 +165,10 @@ export default function Visualizer() {
 
       case 'astar':
         visitedNodesInOrder = astar(grid, grid[SROW][SCOL], grid[EROW][ECOL])
+        break
+
+      case 'greedy':
+        visitedNodesInOrder = greedy(grid, grid[SROW][SCOL], grid[EROW][ECOL])
         break
 
       case 'dfs':
