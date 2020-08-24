@@ -154,7 +154,8 @@ export default function Visualizer() {
     })
   }
 
-  const visualize = () => {
+  const visualize = async () => {
+    await clearAnimations()
     let visitedNodesInOrder
     switch (currentAlg) {
       case 'dijkstra':
