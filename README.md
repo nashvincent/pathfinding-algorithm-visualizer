@@ -6,7 +6,8 @@ This project was written in React to visualize some of the most popular Pathfind
 
 1. Dijkstra (unweighted)
 2. A\* search
-3. Depth First Search
+3. Greedy Best First Search
+4. Depth First Search
 
 Feel free to raise an Issue on Github in case you run into and Error (there's bound to be quite a few). Feel free to raise a pull request if you wish to contribute as well.
 
